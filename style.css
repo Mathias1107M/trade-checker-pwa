@@ -1,0 +1,206 @@
+:root {
+  --bg: linear-gradient(180deg, #eef8f0 0%, #f6f3eb 100%);
+  --card: #ffffff;
+  --text: #14301f;
+  --muted: #557164;
+  --border: rgba(20, 48, 31, 0.12);
+  --success: #1f9d55;
+  --danger: #d64545;
+  --danger-soft: #fff0f0;
+  --success-soft: #ebfff2;
+  --shadow: 0 18px 40px rgba(20, 48, 31, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+}
+
+.card {
+  width: min(100%, 520px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px 18px;
+  box-shadow: var(--shadow);
+}
+
+.card.success {
+  background: var(--success-soft);
+}
+
+.card.failure {
+  background: var(--danger-soft);
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--success);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.category {
+  margin: 0 0 10px;
+  color: var(--success);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.question {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.6;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.answer-button,
+.reset-button {
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.answer-button:hover,
+.reset-button:hover {
+  transform: translateY(-1px);
+}
+
+.answer-button:active,
+.reset-button:active {
+  transform: translateY(0);
+}
+
+.answer-button.yes {
+  background: #1f9d55;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(31, 157, 85, 0.28);
+}
+
+.answer-button.no {
+  background: #f3efe6;
+  color: var(--text);
+}
+
+.reset-button {
+  width: 100%;
+  margin-top: 20px;
+  background: #14301f;
+  color: #fff;
+}
+
+.status-box {
+  border-radius: 18px;
+  padding: 18px;
+  line-height: 1.7;
+}
+
+.status-box.success {
+  background: rgba(31, 157, 85, 0.1);
+}
+
+.status-box.failure {
+  background: rgba(214, 69, 69, 0.1);
+}
+
+.status-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.status-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
+.footer {
+  margin-top: 28px;
+}
+
+.progress-text {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(20, 48, 31, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #1f9d55 0%, #68c98f 100%);
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+
+.lock-timer {
+  margin-top: 10px;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+@media (min-width: 700px) {
+  .card {
+    padding: 32px;
+  }
+
+  .question {
+    font-size: 1.5rem;
+  }
+}

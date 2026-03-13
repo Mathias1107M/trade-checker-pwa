@@ -1,0 +1,11 @@
+{
+  "name": "交易檢查工具",
+  "short_name": "交易檢查",
+  "description": "交易前逐題檢查情緒、策略、風險與交易結構，全部符合才允許交易。",
+  "lang": "zh-Hant",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef8f0",
+  "theme_color": "#1f9d55",
+  "orientation": "portrait-primary"
+}
