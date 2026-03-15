@@ -62,7 +62,7 @@ const questions = [
   {
     id: 11,
     category: "風險管理",
-    text: "如果這筆交易失敗，我不會立刻再做下一筆交易。",
+    text: "這筆交易的部位安排應符合既定規則且分批進場布局。",
     correctAnswer: true
   },
   {
@@ -74,40 +74,85 @@ const questions = [
   {
     id: 13,
     category: "交易結構",
-    text: "我打算先用較小部位進場，再視情況加碼。",
+    text: "這筆交易若失敗，我仍會等待新的訊號再進場。",
     correctAnswer: true
   },
   {
     id: 14,
     category: "交易結構",
-    text: "這筆交易若失敗，我仍會等待新的訊號再進場。",
-    correctAnswer: true
-  },
-  {
-    id: 15,
-    category: "交易結構",
     text: "我現在進場主要是因為市場看起來快要動了。",
     correctAnswer: false
   },
   {
-    id: 16,
+    id: 15,
     category: "交易結構",
     text: "即使今天完全不交易，也不會影響我的整體策略。",
+    correctAnswer: true
+  },
+  {
+    id: 16,
+    category: "策略回顧",
+    text: "若相同策略已連續兩次停損，我會降低部位；若已連續三次停損，我會暫停該策略交易。",
+    correctAnswer: true
+  },
+  {
+    id: 17,
+    category: "策略回顧",
+    text: "我現在不是在極短期內以相同策略重複進場，例如停損後七個工作天內再次進場。",
+    correctAnswer: true
+  },
+  {
+    id: 18,
+    category: "策略回顧",
+    text: "我清楚知道，控制虧損比少賺一次更重要。",
     correctAnswer: true
   }
 ];
 
 const LOCK_KEY = "tradeChecklistLockUntil";
 const LOCK_DURATION_MS = 10 * 60 * 1000;
+const REPEAT_QUESTION_COUNT = 2;
 
 let currentIndex = 0;
 let answers = [];
 let timerId = null;
+let sessionQuestions = buildSessionQuestions();
 
 const app = document.getElementById("app");
 const content = document.getElementById("content");
 const progressText = document.getElementById("progressText");
 const progressBar = document.getElementById("progressBar");
+
+function shuffleArray(items) {
+  const result = [...items];
+
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  return result;
+}
+
+function pickRandomItems(items, count) {
+  return shuffleArray(items).slice(0, Math.min(count, items.length));
+}
+
+function buildSessionQuestions() {
+  const randomized = shuffleArray(questions);
+  const repeatedQuestions = pickRandomItems(randomized, REPEAT_QUESTION_COUNT).map((question, index) => ({
+    ...question,
+    sessionRepeatKey: `${question.id}-repeat-${index + 1}`
+  }));
+  const sessionList = [...randomized];
+
+  repeatedQuestions.forEach((question) => {
+    const insertIndex = Math.floor(Math.random() * (sessionList.length + 1));
+    sessionList.splice(insertIndex, 0, question);
+  });
+
+  return sessionList;
+}
 
 function getLockUntil() {
   const storedValue = localStorage.getItem(LOCK_KEY);
@@ -135,13 +180,14 @@ function formatRemaining(ms) {
 }
 
 function updateProgress(doneCount) {
-  progressText.textContent = `Progress: ${doneCount} / ${questions.length}`;
-  progressBar.style.width = `${(doneCount / questions.length) * 100}%`;
+  progressText.textContent = `Progress: ${doneCount} / ${sessionQuestions.length}`;
+  progressBar.style.width = `${(doneCount / sessionQuestions.length) * 100}%`;
 }
 
 function resetSession() {
   currentIndex = 0;
   answers = [];
+  sessionQuestions = buildSessionQuestions();
   app.classList.remove("success", "failure");
   stopLockTimer();
   render();
@@ -168,7 +214,7 @@ function startLockTimer() {
 }
 
 function handleAnswer(answer) {
-  const question = questions[currentIndex];
+  const question = sessionQuestions[currentIndex];
   answers.push(answer);
 
   if (answer !== question.correctAnswer) {
@@ -181,7 +227,7 @@ function handleAnswer(answer) {
 
   currentIndex += 1;
 
-  if (currentIndex >= questions.length) {
+  if (currentIndex >= sessionQuestions.length) {
     renderSuccess();
     return;
   }
@@ -190,12 +236,12 @@ function handleAnswer(answer) {
 }
 
 function renderQuestion() {
-  const question = questions[currentIndex];
+  const question = sessionQuestions[currentIndex];
   app.classList.remove("success", "failure");
   updateProgress(currentIndex);
 
   content.innerHTML = `
-    <p class="category">${question.category} (${currentIndex + 1}/${questions.length})</p>
+    <p class="category">${question.category} (${currentIndex + 1}/${sessionQuestions.length})</p>
     <p class="question">${question.text}</p>
     <div class="actions">
       <button class="answer-button yes" data-answer="yes" type="button">是</button>
@@ -213,11 +259,11 @@ function renderQuestion() {
 function renderSuccess() {
   app.classList.add("success");
   app.classList.remove("failure");
-  updateProgress(questions.length);
+  updateProgress(sessionQuestions.length);
   content.innerHTML = `
     <div class="status-box success">
       <p class="status-title">✅ 檢查通過，可以交易</p>
-      <p class="status-note">全部 ${questions.length} 題皆符合預設答案。</p>
+      <p class="status-note">本次全部 ${sessionQuestions.length} 題皆符合預設答案。</p>
     </div>
     <button id="restartButton" class="reset-button" type="button">重新檢查</button>
   `;
