@@ -1,4 +1,4 @@
-const CACHE_NAME = "trade-checklist-v1";
+const CACHE_NAME = "trade-checklist-v2";
 const APP_ASSETS = [
   "./",
   "./index.html",
@@ -32,19 +32,38 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+  const requestUrl = new URL(event.request.url);
+  const isAppAsset =
+    requestUrl.origin === self.location.origin &&
+    (
+      requestUrl.pathname.endsWith("/") ||
+      requestUrl.pathname.endsWith("/index.html") ||
+      requestUrl.pathname.endsWith("/style.css") ||
+      requestUrl.pathname.endsWith("/app.js") ||
+      requestUrl.pathname.endsWith("/manifest.json")
+    );
 
-      return fetch(event.request)
-        .then((networkResponse) => {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          return networkResponse;
-        })
-        .catch(() => caches.match("./index.html"));
-    })
+  event.respondWith(
+    (isAppAsset
+      ? fetch(event.request)
+          .then((networkResponse) => {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+            return networkResponse;
+          })
+          .catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse || caches.match("./index.html")))
+      : caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+
+          return fetch(event.request)
+            .then((networkResponse) => {
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+              return networkResponse;
+            })
+            .catch(() => caches.match("./index.html"));
+        }))
   );
 });
