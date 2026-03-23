@@ -106,6 +106,12 @@ const questions = [
     category: "策略回顧",
     text: "我清楚知道，控制虧損比少賺一次更重要。",
     correctAnswer: true
+  },
+  {
+    id: 19,
+    category: "策略回顧",
+    text: "本次進場是否違反最低觀察期（距前次進場未滿一個月）？",
+    correctAnswer: false
   }
 ];
 
